@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - NutriMorph</title>
+
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/dashboard.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>NutriMorph</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="/pages/dashboard.html" class="nav-item active">Dashboard</a>
+          <a href="/pages/mealplan.html" class="nav-item">Meal Plans</a>
+          <a href="/pages/progress.html" class="nav-item">Progress</a>
+          <a href="/pages/profile.html" class="nav-item">Profile</a>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <h1>Dashboard</h1>
+            <p>Welcome, <span id="usernameText">User</span></p>
+          </div>
+
+          <div class="top-bar-right">
+            <a href="/pages/profile.html" class="profile-link">
+              <i
+                class="fa-solid fa-circle-user"
+                style="font-size: 28px; color: #4b5563"
+              ></i>
+              <span
+                id="usernameSmall"
+                style="margin-left: 8px; font-weight: 600; color: #374151"
+              ></span>
+            </a>
+
+            <button id="logoutBtn" class="btn-logout small">Logout</button>
+          </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3 id="caloriesToday">0</h3>
+              <p>Calories Today</p>
+            </div>
+
+            <div class="stat-card">
+              <h3 id="currentWeight">--</h3>
+              <p>Latest Weight</p>
+            </div>
+
+            <div class="stat-card">
+              <h3 id="streakDays">0</h3>
+              <p>Streak (Days)</p>
+            </div>
+
+            <div class="stat-card">
+              <h3 id="trend">--</h3>
+              <p>7-Day Trend</p>
+            </div>
+          </div>
+
+          <!-- Weight Chart -->
+          <div class="card" style="padding-bottom: 20px">
+            <div class="card-header">
+              <h3>Weight Trend (Last 7 Days)</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="weightChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Meal Plan History -->
+          <div class="card" id="mealPlanCard" style="display: none">
+            <div class="card-header">
+              <h3>Recent Meal Plan</h3>
+            </div>
+            <div id="mealPlanContainer"></div>
+          </div>
+
+          <!-- AI Recommendations -->
+          <div class="card">
+            <div class="card-header">
+              <h3>AI Recommendations</h3>
+            </div>
+            <div id="aiRecommendations" class="recommendations"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      /* Load User */
+      async function loadUser() {
+        const res = await fetch("/api/me", { credentials: "include" });
+        const data = await res.json();
+
+        if (!data.loggedIn) return (window.location.href = "/login");
+
+        document.getElementById("usernameText").textContent = data.user.name;
+        document.getElementById("usernameSmall").textContent = data.user.name;
+      }
+      loadUser();
+
+      /* Logout */
+      document.getElementById("logoutBtn").onclick = async () => {
+        await fetch("/api/logout", { method: "POST", credentials: "include" });
+        window.location.href = "/login";
+      };
+
+      /* Load Dashboard */
+      async function loadDashboard() {
+        const res = await fetch("/api/dashboard/summary", {
+          credentials: "include",
+        });
+        const result = await res.json();
+
+        if (!result.success) return;
+
+        const d = result.data;
+
+        document.getElementById("caloriesToday").textContent = d.caloriesToday;
+        document.getElementById("currentWeight").textContent = d.currentWeightKg
+          ? d.currentWeightKg + " kg"
+          : "--";
+
+        document.getElementById("streakDays").textContent = d.streakDays;
+
+        const trend = d.weightTrendLast7Days;
+        document.getElementById("trend").textContent =
+          trend >= 0 ? "+" + trend : trend;
+
+        buildChart(d.recentWeights);
+        renderMealPlan(d.latestMealPlan);
+        renderRecommendations(d.recommendations);
+      }
+
+      function buildChart(data) {
+        if (!data || data.length === 0) return;
+
+        const ctx = document.getElementById("weightChart");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.map((e) => e.date),
+            datasets: [
+              {
+                label: "Weight (kg)",
+                data: data.map((e) => e.weight),
+                borderWidth: 2,
+                borderColor: "#3b82f6",
+                tension: 0.25,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: false } },
+          },
+        });
+      }
+
+      function renderMealPlan(plan) {
+        const card = document.getElementById("mealPlanCard");
+        const box = document.getElementById("mealPlanContainer");
+
+        if (!plan) {
+          card.style.display = "none";
+          return;
+        }
+
+        card.style.display = "block";
+
+        box.innerHTML = `
+      <p><strong>${plan.daySummary}</strong></p>
+      <p><strong>Total Calories:</strong> ${plan.totalCalories} kcal</p>
+
+      <div class="meals-list">
+        ${plan.meals
+          .map(
+            (m) => `
+          <div class="meal-item">
+              <div class="meal-details">
+                  <h4>${m.timeOfDay} – ${m.title}</h4>
+                  <p>${m.description}</p>
+                  <span class="calories">${m.calories} kcal</span>
+              </div>
+          </div>`
+          )
+          .join("")}
+      </div>
+  `;
+      }
+
+      function renderRecommendations(list) {
+        const box = document.getElementById("aiRecommendations");
+        box.innerHTML = "";
+
+        if (!list.length) {
+          box.innerHTML = "<p>No recommendations yet.</p>";
+          return;
+        }
+
+        box.innerHTML = list
+          .map(
+            (r) => `
+      <div class="recommendation-item">
+        <div class="recommendation-icon">${r.icon}</div>
+        <div class="recommendation-content">
+            <h4>${r.title}</h4>
+            <p>${r.body}</p>
+        </div>
+      </div>
+    `
+          )
+          .join("");
+      }
+
+      loadDashboard();
+    </script>
+
+    <style>
+      /* Make chart smaller but clean */
+      .chart-wrapper {
+        height: 220px;
+        padding: 12px;
+      }
+
+      /* Red logout button */
+      .btn-logout {
+        background: #ef4444 !important;
+        border: none;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-logout:hover {
+        background: #dc2626 !important;
+      }
+
+      /* Profile link — clean alignment */
+      .profile-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+      }
+    </style>
+  </body>
+</html>

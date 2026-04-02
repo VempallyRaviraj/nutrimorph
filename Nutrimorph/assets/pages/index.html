@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NutriMorph – AI Nutrition Coach</title>
+
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/landing.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <header class="landing-header">
+      <div class="landing-container">
+        <div class="logo-section">
+          <span class="logo-text">NutriMorph</span>
+        </div>
+
+        <nav class="landing-nav">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#pricing">Pricing</a>
+          <a href="/login" class="btn-link">Login</a>
+          <a href="/register" class="btn-primary">Get Started</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main class="landing-main">
+      <section class="hero">
+        <div class="landing-container hero-grid">
+          <!-- LEFT SIDE -->
+          <div class="hero-text">
+            <h1>AI-Powered Personalized Nutrition</h1>
+
+            <p>
+              NutriMorph creates meal plans and tracks progress using personal
+              goals, lifestyle, and dietary preferences in a simple and
+              organized way.
+            </p>
+
+            <div class="hero-actions">
+              <a href="/register" class="btn-primary">Get Started</a>
+              <a href="/login" class="btn-secondary"
+                >I already have an account</a
+              >
+            </div>
+
+            <p class="hero-note">
+              No credit card required. Get your first AI meal plan in under a
+              minute.
+            </p>
+          </div>
+
+          <!-- RIGHT SIDE IMAGE -->
+          <div class="hero-visual">
+            <img
+              src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800"
+              alt="Healthy food"
+              class="hero-image"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section id="features" class="features">
+        <div class="landing-container">
+          <div class="section-header">
+            <h2>Powerful Features for Your Success</h2>
+            <p>
+              NutriMorph provides clear tools to support long-term nutrition
+              goals.
+            </p>
+          </div>
+
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">📊</div>
+              <h3>Personalized Plans</h3>
+              <p>
+                Plans are generated based on goals, health inputs, and lifestyle
+                habits.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">⚙️</div>
+              <h3>Dynamic Adaptation</h3>
+              <p>Meal plans evolve as new progress entries are made.</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">❤️</div>
+              <h3>Health Monitoring</h3>
+              <p>Track weight trends, calories, macros, adherence, and mood.</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">🤝</div>
+              <h3>Support & Guidance</h3>
+              <p>Clear, simple guidance to keep nutrition habits consistent.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="how-it-works" class="how-it-works">
+        <div class="landing-container">
+          <div class="section-header">
+            <h2>How NutriMorph Works</h2>
+            <p>Simple steps to improve day-to-day nutrition.</p>
+          </div>
+
+          <div class="steps-container">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Set Your Goals</h3>
+                <p>
+                  Choose your nutrition focus—weight management, strength, or
+                  health optimization.
+                </p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>AI Analysis</h3>
+                <p>
+                  NutriMorph reviews health inputs and creates a tailored plan.
+                </p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>Follow & Track</h3>
+                <p>
+                  Log progress and stay aware of trends and habits over time.
+                </p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3>Adaptive Results</h3>
+                <p>
+                  Plans adjust as your needs change, helping maintain steady
+                  progress.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA (Pricing Section) -->
+      <section id="pricing" class="cta">
+        <div class="landing-container">
+          <div class="cta-content">
+            <h2>Ready to Transform Your Nutrition?</h2>
+            <p>Join users improving daily habits with NutriMorph.</p>
+            <!-- Removed "Start Free Trial" as requested -->
+            <a href="/register" class="btn-primary large">Get Started</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+      <div class="landing-container footer-grid">
+        <span>© <span id="yearSpan"></span> NutriMorph</span>
+
+        <div class="footer-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("yearSpan").textContent =
+        new Date().getFullYear();
+
+      // Optional logged-in redirect
+      (async () => {
+        try {
+          const res = await fetch("/api/me", { credentials: "include" });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.loggedIn) {
+            // window.location.href = "/pages/dashboard.html";
+          }
+        } catch (e) {
+          console.warn("Session check failed", e);
+        }
+      })();
+    </script>
+  </body>
+</html>

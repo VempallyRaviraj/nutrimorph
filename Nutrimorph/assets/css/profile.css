@@ -1,0 +1,143 @@
+.profile-content {
+    padding: var(--space-6);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-grid {
+    display: grid;
+    gap: var(--space-6);
+}
+
+.profile-form {
+    padding: var(--space-6);
+}
+
+.profile-avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--space-8);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: var(--space-4);
+    border: 4px solid var(--gray-200);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--gray-200);
+    margin-top: var(--space-6);
+}
+
+/* Settings List */
+.settings-list {
+    padding: var(--space-6);
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item.danger .setting-info h4 {
+    color: var(--danger);
+}
+
+.setting-info h4 {
+    margin: 0 0 var(--space-1) 0;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.setting-info p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+/* Form States */
+.profile-form input:disabled,
+.profile-form select:disabled,
+.profile-form textarea:disabled {
+    background-color: var(--gray-50);
+    border-color: var(--gray-200);
+    color: var(--gray-600);
+    cursor: default;
+}
+
+.profile-form input:not(:disabled),
+.profile-form select:not(:disabled),
+.profile-form textarea:not(:disabled) {
+    background-color: var(--white);
+    border-color: var(--gray-300);
+}
+
+.profile-form input:not(:disabled):focus,
+.profile-form select:not(:disabled):focus,
+.profile-form textarea:not(:disabled):focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Checkbox Groups in Profile */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.checkbox-group .checkbox-label {
+    margin-bottom: 0 !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .profile-content {
+        padding: var(--space-4);
+    }
+    
+    .profile-form {
+        padding: var(--space-4);
+    }
+    
+    .profile-avatar-section {
+        margin-bottom: var(--space-6);
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+    
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+}

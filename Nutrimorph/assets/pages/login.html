@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - NutriMorph</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-color: #10b981;
+        --secondary-color: #059669;
+        --danger-color: #ef4444;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f9fafb;
+        --bg-white: #ffffff;
+        --border-color: #e5e7eb;
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg-white);
+        color: var(--text-dark);
+      }
+      .auth-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+        background: var(--bg-white);
+      }
+      .auth-form-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      }
+      .auth-card {
+        width: 100%;
+        max-width: 420px;
+        background: var(--bg-white);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-lg);
+      }
+      .auth-header {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      .auth-header h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .auth-header p {
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+      .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+      .form-group input[type="email"],
+      .form-group input[type="password"] {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        background: var(--bg-white);
+        color: var(--text-dark);
+        transition: var(--transition);
+      }
+      .form-group input[type="email"]:focus,
+      .form-group input[type="password"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      }
+      .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+      }
+      .checkbox-label input[type="checkbox"] {
+        display: none;
+      }
+      .checkmark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--bg-white);
+        transition: var(--transition);
+      }
+      .checkbox-label input[type="checkbox"]:checked + .checkmark {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+      .checkmark::after {
+        content: "✓";
+        color: var(--bg-white);
+        font-size: 0.75rem;
+        font-weight: 700;
+        opacity: 0;
+        transition: var(--transition);
+      }
+      .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+        opacity: 1;
+      }
+      .link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .full-width {
+        width: 100%;
+      }
+      .btn-primary {
+        background: var(--primary-color);
+        color: var(--bg-white);
+        margin-top: 0.5rem;
+      }
+      .btn-primary:hover {
+        background: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+      .error-message {
+        color: var(--danger-color);
+        font-size: 0.8125rem;
+      }
+      .success-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--primary-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        z-index: 1000;
+      }
+      .auth-image-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .auth-image {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      .auth-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .auth-image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(16, 185, 129, 0.8),
+          rgba(5, 150, 105, 0.8)
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        padding: 2rem;
+      }
+      @media (max-width: 768px) {
+        .auth-container {
+          grid-template-columns: 1fr;
+        }
+        .auth-image-section {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <!-- Login Form Section -->
+      <div class="auth-form-section">
+        <div class="auth-card">
+          <div class="auth-header">
+            <h1>Welcome</h1>
+            <p>Sign in to continue your nutrition journey</p>
+          </div>
+
+          <form class="auth-form" id="loginForm">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div class="form-options">
+              <label class="checkbox-label">
+                <input type="checkbox" id="remember" name="remember" />
+                <span class="checkmark"></span>
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="link">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary full-width">
+              Sign In
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p>
+              Don't have an account?
+              <a href="/register" class="link">Sign Up</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Section -->
+      <div class="auth-image-section">
+        <div class="auth-image">
+          <img
+            src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Healthy lifestyle"
+          />
+          <div class="auth-image-overlay">
+            <h2>Welcome!</h2>
+            <p>
+              Continue your personalized nutrition journey where you left off
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class AuthManager {
+        constructor() {
+          this.form = document.getElementById("loginForm");
+          this.emailInput = document.getElementById("email");
+          this.passwordInput = document.getElementById("password");
+          this.rememberCheckbox = document.getElementById("remember");
+
+          this.init();
+        }
+
+        init() {
+          this.attachEventListeners();
+          this.restoreSavedEmail();
+          this.checkAlreadyLoggedIn();
+        }
+
+        async checkAlreadyLoggedIn() {
+          try {
+            const res = await fetch("/api/me", { credentials: "include" });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.loggedIn) {
+              window.location.href = "/pages/dashboard.html";
+            }
+          } catch (e) {
+            console.warn("Session check failed");
+          }
+        }
+
+        attachEventListeners() {
+          this.form.addEventListener("submit", (e) => this.handleLogin(e));
+          this.emailInput.addEventListener("blur", () => this.validateEmail());
+          this.passwordInput.addEventListener("blur", () =>
+            this.validatePassword()
+          );
+        }
+
+        validateEmail() {
+          const email = this.emailInput.value.trim();
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!email) {
+            this.showError(this.emailInput, "Email is required");
+            return false;
+          }
+          if (!emailRegex.test(email)) {
+            this.showError(this.emailInput, "Please enter a valid email");
+            return false;
+          }
+          this.clearError(this.emailInput);
+          return true;
+        }
+
+        validatePassword() {
+          const pwd = this.passwordInput.value;
+          if (!pwd) {
+            this.showError(this.passwordInput, "Password is required");
+            return false;
+          }
+          if (pwd.length < 6) {
+            this.showError(
+              this.passwordInput,
+              "Password must be at least 6 characters"
+            );
+            return false;
+          }
+          this.clearError(this.passwordInput);
+          return true;
+        }
+
+        showError(input, message) {
+          const group = input.closest(".form-group");
+          const existing = group.querySelector(".error-message");
+          if (existing) existing.remove();
+          input.style.borderColor = "#ef4444";
+          input.style.boxShadow = "0 0 0 3px rgba(239,68,68,0.1)";
+          const p = document.createElement("p");
+          p.className = "error-message";
+          p.textContent = message;
+          group.appendChild(p);
+        }
+
+        clearError(input) {
+          const group = input.closest(".form-group");
+          const existing = group.querySelector(".error-message");
+          if (existing) existing.remove();
+          input.style.borderColor = "";
+          input.style.boxShadow = "";
+        }
+
+        showSuccess(message) {
+          const n = document.createElement("div");
+          n.className = "success-notification";
+          n.textContent = message;
+          document.body.appendChild(n);
+          setTimeout(() => n.remove(), 3000);
+        }
+
+        saveEmail(email) {
+          localStorage.setItem("nutrimorph_saved_email", email);
+        }
+
+        restoreSavedEmail() {
+          const saved = localStorage.getItem("nutrimorph_saved_email");
+          if (saved) {
+            this.emailInput.value = saved;
+            this.rememberCheckbox.checked = true;
+          }
+        }
+
+        clearSavedEmail() {
+          localStorage.removeItem("nutrimorph_saved_email");
+        }
+
+        async handleLogin(e) {
+          e.preventDefault();
+          const validEmail = this.validateEmail();
+          const validPassword = this.validatePassword();
+          if (!validEmail || !validPassword) return;
+
+          const email = this.emailInput.value.trim();
+          const password = this.passwordInput.value;
+          const remember = this.rememberCheckbox.checked;
+
+          if (remember) this.saveEmail(email);
+          else this.clearSavedEmail();
+
+          const submitBtn = this.form.querySelector('button[type="submit"]');
+          const originalText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Signing in...";
+
+          try {
+            const res = await fetch("/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ email, password }),
+            });
+
+            const result = await res.json();
+            if (res.ok && result.success) {
+              this.showSuccess("Login successful! Redirecting...");
+              setTimeout(
+                () => (window.location.href = "/pages/dashboard.html"),
+                800
+              );
+            } else {
+              this.showError(
+                this.passwordInput,
+                result.message || "Invalid credentials"
+              );
+            }
+          } catch (err) {
+            this.showError(
+              this.passwordInput,
+              "Something went wrong. Please try again."
+            );
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => new AuthManager());
+    </script>
+  </body>
+</html>

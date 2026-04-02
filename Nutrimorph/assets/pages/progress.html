@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Progress – NutriMorph</title>
+
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/progress.css" />
+    <link rel="stylesheet" href="/assets/css/dashboard.css" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>NutriMorph</h2>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/pages/dashboard.html" class="nav-item">Dashboard</a>
+          <a href="/pages/mealplan.html" class="nav-item">Meal Plans</a>
+          <a href="/pages/progress.html" class="nav-item active">Progress</a>
+          <a href="/pages/profile.html" class="nav-item">Profile</a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="top-bar">
+          <div>
+            <h1>Progress</h1>
+            <p>Track your weight, calories, macros and more</p>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <div class="progress-grid">
+            <!-- Log Form -->
+            <div class="card card-form">
+              <div class="card-header">
+                <h3>Log Progress</h3>
+              </div>
+
+              <form id="progressForm" class="progress-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="date" required />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" step="0.1" id="weightKg" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Calories</label>
+                    <input type="number" id="caloriesConsumed" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Adherence (%)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      id="adherenceScore"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Protein (g)</label>
+                    <input type="number" id="proteinG" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Carbs (g)</label>
+                    <input type="number" id="carbsG" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Fats (g)</label>
+                    <input type="number" id="fatsG" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Mood</label>
+                  <input type="text" id="mood" placeholder="e.g. Energetic" />
+                </div>
+
+                <div class="form-group">
+                  <label>Notes</label>
+                  <textarea id="notes" rows="3"></textarea>
+                </div>
+
+                <button class="btn-primary">Save Progress</button>
+              </form>
+            </div>
+
+            <!-- Chart -->
+            <div class="card card-chart">
+              <div class="card-header">
+                <h3>Weight Trend</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="progressWeightChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Recent Entries -->
+            <div class="card card-table">
+              <div class="card-header">
+                <h3>Recent Entries</h3>
+              </div>
+
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Weight</th>
+                      <th>Calories</th>
+                      <th>Adherence</th>
+                      <th>Mood</th>
+                      <th>Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody id="progressTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      let progressChart = null;
+
+      function setToday() {
+        const d = new Date();
+        document.getElementById("date").value = d.toISOString().slice(0, 10);
+      }
+
+      async function loadProgress() {
+        const res = await fetch("/api/progress?limit=30", {
+          credentials: "include",
+        });
+
+        const { data } = await res.json();
+        const tbody = document.getElementById("progressTableBody");
+        tbody.innerHTML = "";
+
+        data.forEach((e) => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${e.date}</td>
+              <td>${e.weightKg || "-"}</td>
+              <td>${e.caloriesConsumed || "-"}</td>
+              <td>${e.adherenceScore ? e.adherenceScore + "%" : "-"}</td>
+              <td>${e.mood || "-"}</td>
+              <td>${e.notes || "-"}</td>
+            </tr>
+          `;
+        });
+
+        buildChart(data);
+      }
+
+      function buildChart(entries) {
+        const sorted = [...entries].reverse();
+        const labels = sorted.map((e) => e.date);
+        const weights = sorted.map((e) => e.weightKg);
+
+        const ctx = document
+          .getElementById("progressWeightChart")
+          .getContext("2d");
+
+        if (progressChart) progressChart.destroy();
+
+        progressChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Weight (kg)",
+                data: weights,
+                borderColor: "#3b82f6",
+                borderWidth: 2,
+                pointRadius: 4,
+                tension: 0.25,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: false },
+            },
+          },
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setToday();
+        loadProgress();
+
+        document
+          .getElementById("progressForm")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const payload = {
+              date: document.getElementById("date").value,
+              weightKg: parseFloat(document.getElementById("weightKg").value),
+              caloriesConsumed: parseInt(
+                document.getElementById("caloriesConsumed").value
+              ),
+              adherenceScore: parseInt(
+                document.getElementById("adherenceScore").value
+              ),
+              proteinG: parseInt(document.getElementById("proteinG").value),
+              carbsG: parseInt(document.getElementById("carbsG").value),
+              fatsG: parseInt(document.getElementById("fatsG").value),
+              mood: document.getElementById("mood").value,
+              notes: document.getElementById("notes").value,
+            };
+
+            await fetch("/api/progress", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify(payload),
+            });
+
+            loadProgress();
+            alert("Progress saved!");
+          });
+      });
+    </script>
+  </body>
+</html>
